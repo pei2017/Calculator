@@ -75,8 +75,14 @@ void Calculator::onButtonBackSpaceClick()
 void Calculator::onButtonEqualClick()
 {
 	m_ui.lineEdit_1->setText("");
-	m_inputStrings.push_back(m_inputing);
-	displayResult();
+	if (m_result.isEmpty())
+	{
+		m_inputStrings.push_back(m_inputing);
+		m_result = calculate();
+		m_inputStrings.clear();
+		resetInputing();
+	}
+	m_ui.lineEdit_2->setText(m_result);
 }
 
 void Calculator::onButtonNumberClick()
@@ -144,8 +150,6 @@ void Calculator::displayResult()//result displays in curLine_
 	if (m_result.isEmpty())
 	{
 		m_result = calculate();
-		m_inputStrings.clear();
-		m_inputStrings.push_back(m_result);
 	}
 	m_ui.lineEdit_2->setText(m_result);	
 	resetInputing();
@@ -234,45 +238,32 @@ Node* Calculator::SuffixTree(const std::vector<QString>& strs)
 		bool isNumber = !isOper(strs[i]);
 		if (isNumber)
 		{
-
 			Node* temp = new NumNode(strs[i].toDouble());
 			nums.push(temp);
 		}
 		else
 		{
-			Node *left, *right;
+			Node *right = nums.top();
+			nums.pop();
+			Node *left = nums.top();
+			nums.pop();
 			char c = strs[i][0].toLatin1();
 			switch (c)
 			{
 			case '+':
-				right = nums.top();
-				nums.pop();
-				left = nums.top();
-				nums.pop();
 				nums.push(new AddNode(left, right));
 				break;
 			case '-':
-				right = nums.top();
-				nums.pop();
-				left = nums.top();
-				nums.pop();
 				nums.push(new SubNode(left, right));
 				break;
 			case '*':
-				right = nums.top();
-				nums.pop();
-				left = nums.top();
-				nums.pop();
 				nums.push(new MutiNode(left, right));
 				break;
 			case '/':
-				right = nums.top();
-				nums.pop();
-				left = nums.top();
-				nums.pop();
 				nums.push(new DivNode(left, right));
 				break;
 			default:
+				assert(false);
 				break;
 			}
 		}
