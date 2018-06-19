@@ -92,7 +92,7 @@ void Calculator::onButtonNumberClick()
 
 	if (inputNumber == "." && m_inputing.contains('.'))//只能一个小数点
 		return;
-	if (m_bInputNone && inputNumber == "0")//忽略多余的0
+	if (inputNumber == "0" && !m_bInputNone && m_inputing == "0")//忽略多余的0
 		return;
 
 	if (!m_result.isEmpty())
