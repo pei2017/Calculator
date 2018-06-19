@@ -6,7 +6,6 @@
 #include "ui_Calculator.h"
 
 #include <vector>
-#include <stack>
 
 class Node
 {
@@ -94,41 +93,36 @@ public:
 	Calculator(QWidget *parent = Q_NULLPTR);
 
 public slots:
-	void onClick();
+	void onButtonClearClick();
+	void onButtonBackSpaceClick();
+	void onButtonEqualClick();
+	void onButtonOperClick();
+	void onButtonNumberClick();
 
 private:
 	std::vector<QString> Suffix(const std::vector<QString>& strs);
 	Node* SuffixTree(const std::vector<QString>& strs);
 
-	QString cal();
-	void calAndDis();
-
+	QString calculate();
+	void displayResult();
 	void onFirstOper(const QString& oper);
 	void onSecondOper(const QString& oper);
 
-	void removeLast(QLineEdit* edit);//for curLine_
-	void changeLast(QLineEdit* edit, const QString& str);//for inputLine_
-
-	void reset();
+	void resetInputing()
+	{
+		m_bInputNone = true;
+		m_inputing = "0";
+	}
 	bool isOper(const QString& str)
 	{
 		return Operators.find(str) != Operators.end();
 	}
 	
 private:
-	Ui::CalculatorClass ui;
-
-	QLineEdit* inputLine_;
-	QLineEdit* curLine_;
-	std::vector<QString> input_;//for cal()
-	QString cur_;		//current input number
-	bool curIsDefalut_;	//true means cur_ is 0 and there is no input_number 
-	QString result_;	//can be empty which means is inputing number, or it means the last result.
-
-	std::vector<QPushButton*> numButtons_;//0 ~ 9 .
-	std::vector<QPushButton*> operButtons_;//+ - * / 
-	QPushButton* calButton_;
-	QPushButton* backButton_;
-	QPushButton* resetButton_;
-	std::vector<QPushButton*> allButtons_;
+	Ui::CalculatorClass m_ui;
+	
+	std::vector<QString> m_inputStrings;//for calculate
+	bool m_bInputNone;
+	QString m_inputing;
+	QString m_result;
 };
