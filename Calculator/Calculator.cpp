@@ -90,16 +90,26 @@ void Calculator::onButtonNumberClick()
 	QPushButton* button = dynamic_cast<QPushButton*>(sender());
 	QString inputNumber = button->text();
 
-	if (inputNumber == "." && m_inputing.contains('.'))//只能一个小数点
-		return;
+	if (inputNumber == ".")
+	{
+		if (m_inputing.contains('.'))//只能一个小数点
+			return;
+		if (m_bInputNone)
+		{
+			m_inputing = "0.";//把.1处理为0.1
+			m_bInputNone = false;
+		}
+	}
+
 	if (inputNumber == "0" && !m_bInputNone && m_inputing == "0")//忽略多余的0
 		return;
 
 	if (!m_result.isEmpty())
 		m_result = "";
-	if (m_bInputNone)
+
+	if (m_bInputNone || (inputNumber != "0" && m_inputing == "0"))//1+02会显示为1+2
 	{
-		m_inputing = (inputNumber == ".") ? "0." : inputNumber;//把.1处理为0.1
+		m_inputing = inputNumber;
 		m_bInputNone = false;
 	}
 	else
