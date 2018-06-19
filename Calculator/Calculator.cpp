@@ -133,7 +133,7 @@ QString Calculator::calculate()
 	{
 		double result = root->cal();
 		delete root;
-		return QString::number(result);
+		return QString::number(result,'g',14);
 	}
 	else
 		return QString("0");
