@@ -14,7 +14,7 @@ const QMap<QString, int> Calculator::Operators =
 Calculator::Calculator(QWidget *parent)
 	: QMainWindow(parent),
 	m_inputing("0"),
-	m_bInputNone(true),
+	m_bEmptyInput(true),
 	m_result("0")
 {
 	m_ui.setupUi(this);
@@ -60,7 +60,7 @@ void Calculator::onButtonClearClick()
 
 void Calculator::onButtonBackSpaceClick()
 {
-	if (m_bInputNone)//无法退格
+	if (m_bEmptyInput)//无法退格
 		return;
 	if (m_inputing.size() == 1)
 	{
@@ -85,32 +85,36 @@ void Calculator::onButtonEqualClick()
 	m_ui.lineEdit_2->setText(m_result);
 }
 
+//会有三种反应：1啥也不干，2输入的覆盖掉lineEdit_2，3输入的append到lineEdit_2后面
 void Calculator::onButtonNumberClick()
 {
 	QPushButton* button = dynamic_cast<QPushButton*>(sender());
 	QString inputNumber = button->text();
 
+	if (!m_result.isEmpty())
+		m_result = "";
+
 	if (inputNumber == ".")
 	{
 		if (m_inputing.contains('.'))//只能一个小数点
 			return;
-		if (m_bInputNone)
+		if (m_bEmptyInput)
 		{
 			m_inputing = "0.";//把.1处理为0.1
-			m_bInputNone = false;
+			m_bEmptyInput = false;
 		}
+		else
+		{
+			m_inputing += inputNumber;
+		}
+		m_ui.lineEdit_2->setText(m_inputing);
+		return;
 	}
 
-	if (inputNumber == "0" && !m_bInputNone && m_inputing == "0")//忽略多余的0
-		return;
-
-	if (!m_result.isEmpty())
-		m_result = "";
-
-	if (m_bInputNone || (inputNumber != "0" && m_inputing == "0"))//1+02会显示为1+2
+	if (m_bEmptyInput || m_inputing == "0")//处理多余的0,例如1+02会显示为1+2
 	{
 		m_inputing = inputNumber;
-		m_bInputNone = false;
+		m_bEmptyInput = false;
 	}
 	else
 	{
@@ -127,16 +131,14 @@ void Calculator::onButtonOperClick()
 	if (!m_result.isEmpty())//把上一次计算得到结果作为输入，继续操作。
 	{
 		m_inputing = m_result;
-		m_inputStrings.push_back(m_inputing);//num
 		onFirstOper(inputChar);
 	}
-	else if (m_bInputNone && isOper(m_inputStrings.back()))//1+ change to 1- when pushButtonMinus
+	else if (m_bEmptyInput && isOper(m_inputStrings.back()))//1+ change to 1- when pushButtonMinus
 	{
 		onSecondOper(inputChar);
 	}
 	else
 	{
-		m_inputStrings.push_back(m_inputing);//num
 		onFirstOper(inputChar);
 	}
 }
@@ -155,22 +157,19 @@ QString Calculator::calculate()
 		return QString("0");
 }
 
-void Calculator::displayResult()//result displays in curLine_
+void Calculator::onFirstOper(const QString & oper)
 {
+	m_inputStrings.push_back(m_inputing);//num
+	m_ui.lineEdit_1->setText(m_ui.lineEdit_1->text() + m_inputing + oper);
 	if (m_result.isEmpty())
 	{
 		m_result = calculate();
+		m_ui.lineEdit_2->setText(m_result);
 	}
-	m_ui.lineEdit_2->setText(m_result);	
-	resetInputing();
-}
-
-void Calculator::onFirstOper(const QString & oper)
-{
-	m_ui.lineEdit_1->setText(m_ui.lineEdit_1->text() + m_inputing + oper);
-	displayResult();
-	m_result = "";
 	m_inputStrings.push_back(oper);//oper
+
+	resetInputing();
+	m_result = "";
 }
 
 void Calculator::onSecondOper(const QString & oper)//1 + - change to 1 -

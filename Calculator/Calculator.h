@@ -104,13 +104,12 @@ private:
 	Node* SuffixTree(const std::vector<QString>& strs);
 
 	QString calculate();
-	void displayResult();
 	void onFirstOper(const QString& oper);
 	void onSecondOper(const QString& oper);
 
 	void resetInputing()
 	{
-		m_bInputNone = true;
+		m_bEmptyInput = true;
 		m_inputing = "0";
 	}
 	bool isOper(const QString& str)
@@ -122,7 +121,7 @@ private:
 	Ui::CalculatorClass m_ui;
 	
 	std::vector<QString> m_inputStrings;//for calculate
-	bool m_bInputNone;
+	bool m_bEmptyInput;
 	QString m_inputing;
 	QString m_result;
 };
