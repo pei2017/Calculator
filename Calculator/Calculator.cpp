@@ -92,14 +92,14 @@ void Calculator::onButtonNumberClick()
 
 	if (inputNumber == "." && m_inputing.contains('.'))//只能一个小数点
 		return;
-	if (m_bInputNone && inputNumber == "0")//把000001视作1
+	if (m_bInputNone && inputNumber == "0")//忽略多余的0
 		return;
 
 	if (!m_result.isEmpty())
 		m_result = "";
 	if (m_bInputNone)
 	{
-		m_inputing = inputNumber;
+		m_inputing = (inputNumber == ".") ? "0." : inputNumber;//把.1处理为0.1
 		m_bInputNone = false;
 	}
 	else
